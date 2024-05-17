@@ -11,46 +11,51 @@ const addUsers = async (req, res) => {
     }
 
     const users = await parseCSV(req.file.path, list);
+    const emailSet = new Set();
+    const uniqueUsers = [];
+    const duplicates = [];
 
-    const results = await Promise.allSettled(
-      users.map(async (user) => {
-        const existingUser = await User.findOne({
-          email: user.email,
-          list: listId,
-        });
-        if (existingUser) {
-          return Promise.reject({
-            data: user,
-            message: "User already exists in the list",
-          });
-        }
-        return new User({ ...user, list: listId }).save();
-      })
+    for (const user of users) {
+      const { email } = user;
+      if (!emailSet.has(email)) {
+        emailSet.add(email);
+        uniqueUsers.push(user);
+      } else {
+        duplicates.push(user);
+      }
+    }
+
+    const existingUsers = await User.find({ list: listId }, "email");
+    const newUsers = uniqueUsers.filter(
+      (user) => !existingUsers.some((u) => u.email === user.email)
     );
 
-    const successfulResults = results.filter((r) => r.status === "fulfilled");
-    const failedResults = results.filter((r) => r.status === "rejected");
-
-    const successfulCount = successfulResults.length;
-    const failedCount = failedResults.length;
+    await User.insertMany(
+      newUsers.map((user) => ({ ...user, list: listId })),
+      { ordered: false }
+    );
 
     let errorCSV = null;
+    const failedInserts = duplicates.concat(existingUsers);
+    console.log(failedInserts);
 
-    if (failedCount > 0) {
+    if (failedInserts.length > 0) {
       errorCSV = "name,email,error\n";
-      failedResults.forEach((result) => {
-        errorCSV += `${result.reason.data.name},${result.reason.data.email},${result.reason.message}\n`;
+      failedInserts.forEach((user) => {
+        errorCSV += `${user.name},${user.email},Duplicate email\n`;
       });
     }
 
-    res.status(200).json({
-      added: successfulCount,
-      failed: failedCount,
+    const successfulInserts = newUsers.length;
+
+    return res.status(200).json({
+      added: successfulInserts,
+      failed: failedInserts.length,
       total: await User.countDocuments({ list: listId }),
       errorCSV: errorCSV,
     });
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: error.message });
   }
 };
 
