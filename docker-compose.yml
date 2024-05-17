@@ -8,16 +8,22 @@ services:
     env_file:
       - .env
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/user-list
+      - MONGODB_URI=mongodb://mongodb:27017/user-list
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+    depends_on:
+      - mongodb
+      - redis
+    restart: unless-stopped
 
   mongodb:
     container_name: mongodb
     image: mongo:latest
     volumes:
       - ./data:/data/db
+    restart: unless-stopped
 
   redis:
     container_name: redis
     image: redis:latest
+    restart: unless-stopped
