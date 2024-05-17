@@ -8,7 +8,7 @@ const parseCSV = (filePath, list) => {
       .pipe(csv())
       .on("data", (data) => {
         const properties = {};
-        for (let prop of list.customProperties) {
+        for (let prop of list.properties) {
           properties[prop.title] = data[prop.title] || prop.fallback;
         }
         results.push({ name: data.name, email: data.email, properties });
