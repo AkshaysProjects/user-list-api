@@ -15,6 +15,11 @@ connect();
 // Parse the request body
 app.use(express.json());
 
+// Homepage
+app.get("/", (_req, res) => {
+  res.send("Welcome to the API");
+});
+
 // Use global api prefix
 app.use("/api", apiRouter);
 
