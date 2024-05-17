@@ -11,6 +11,9 @@ dotenv.config();
 // Connect to MongoDB
 connect();
 
+// Parse the request body
+app.use(express.json());
+
 // Use global api prefix
 app.use("/api", apiRouter);
 
