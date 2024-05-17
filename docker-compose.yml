@@ -16,7 +16,7 @@ services:
     container_name: mongodb
     image: mongo:latest
     volumes:
-      - mongodb_data:/data/db
+      - ./data:/data/db
 
   redis:
     container_name: redis
