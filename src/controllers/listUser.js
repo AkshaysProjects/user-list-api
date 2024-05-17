@@ -99,4 +99,26 @@ const getUserById = async (req, res) => {
   }
 };
 
-export { addUsers, getUsers, getUserById };
+// Delete a user by ID
+const deleteUserById = async (req, res) => {
+  try {
+    const { listId, userId } = req.params;
+    const list = await List.findById(listId);
+
+    if (!list) {
+      return res.status(404).json({ error: "List not found" });
+    }
+
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ message: "User deleted" });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export { addUsers, getUsers, getUserById, deleteUserById };

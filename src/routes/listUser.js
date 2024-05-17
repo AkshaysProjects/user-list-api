@@ -1,6 +1,11 @@
 import { Router } from "express";
 import multer from "multer";
-import { addUsers, getUsers, getUserById } from "../controllers/listUser.js";
+import {
+  addUsers,
+  getUsers,
+  getUserById,
+  deleteUserById,
+} from "../controllers/listUser.js";
 
 // Create a new express router instance
 const router = Router({ mergeParams: true });
@@ -16,5 +21,8 @@ router.get("/", getUsers);
 
 // Get a user by ID
 router.get("/:userId", getUserById);
+
+// Delete a user by ID
+router.delete("/:userId", deleteUserById);
 
 export default router;
