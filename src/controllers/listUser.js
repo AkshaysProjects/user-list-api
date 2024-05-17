@@ -1,5 +1,6 @@
 import { List, User } from "../models/index.js";
 import parseCSV from "../services/csvService.js";
+import { addMessage } from "../utils/messageQueue.js";
 
 const addUsers = async (req, res) => {
   try {
@@ -34,6 +35,15 @@ const addUsers = async (req, res) => {
       newUsers.map((user) => ({ ...user, list: listId })),
       { ordered: false }
     );
+    newUsers.forEach((user) => {
+      const unsubscribeLink = `${process.env.BASE_URL}/api/lists/${listId}/users/unsubscribe?email=${user.email}`;
+      addMessage({
+        name: user.name,
+        email: user.email,
+        city: user.properties.city,
+        unsubscribeLink,
+      });
+    });
 
     let errorCSV = null;
     const failedInserts = duplicates.concat(existingUsers);
@@ -120,4 +130,26 @@ const deleteUserById = async (req, res) => {
   }
 };
 
-export { addUsers, getUsers, getUserById, deleteUserById };
+// Unsubscribe a user
+const unsubscribeUser = async (req, res) => {
+  try {
+    const { listId } = req.params;
+    const { email } = req.query;
+    const list = await List.findById(listId);
+    if (!list) {
+      return res.status(404).json({ error: "List not found" });
+    }
+
+    const user = await User.findOneAndDelete({ email, list: listId });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ message: "User unsubscribed" });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export { addUsers, getUsers, getUserById, deleteUserById, unsubscribeUser };

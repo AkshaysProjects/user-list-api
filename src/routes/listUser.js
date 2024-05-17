@@ -5,6 +5,7 @@ import {
   getUsers,
   getUserById,
   deleteUserById,
+  unsubscribeUser,
 } from "../controllers/listUser.js";
 
 // Create a new express router instance
@@ -18,6 +19,9 @@ router.post("/", upload.single("file"), addUsers);
 
 // Get all users in a list
 router.get("/", getUsers);
+
+// Unsubscribe a user
+router.get("/unsubscribe", unsubscribeUser);
 
 // Get a user by ID
 router.get("/:userId", getUserById);

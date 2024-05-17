@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import apiRouter from "./routes/index.js";
 import { connect } from "./db/index.js";
+import "./utils/messageQueue.js";
 
 // Create a new express application instance
 const app = express();
