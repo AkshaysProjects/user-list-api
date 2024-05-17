@@ -37,7 +37,6 @@ const addUsers = async (req, res) => {
 
     let errorCSV = null;
     const failedInserts = duplicates.concat(existingUsers);
-    console.log(failedInserts);
 
     if (failedInserts.length > 0) {
       errorCSV = "name,email,error\n";
