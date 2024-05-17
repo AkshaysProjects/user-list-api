@@ -1,15 +1,14 @@
 import express from "express";
 import dotenv from "dotenv";
+import apiRouter from "./routes/index.js";
 
 // Create a new express application instance
 const app = express();
 
 dotenv.config();
 
-// Root path
-app.get("/", (_req, res) => {
-  res.send("Hello world!");
-});
+// Use global api prefix
+app.use("/api", apiRouter);
 
 // Set up the port
 const port = process.env.PORT || 3000;
