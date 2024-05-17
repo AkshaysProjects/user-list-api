@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import apiRouter from "./routes/index.js";
 import { connect } from "./db/index.js";
 import "./utils/messageQueue.js";
+import verifyToken from "./middlewares/verifyToken.js";
 
 // Create a new express application instance
 const app = express();
@@ -21,7 +22,7 @@ app.get("/", (_req, res) => {
 });
 
 // Use global api prefix
-app.use("/api", apiRouter);
+app.use("/api", verifyToken, apiRouter);
 
 // Set up the port
 const port = process.env.PORT || 3000;
